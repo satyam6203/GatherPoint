@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { ChevronRight, Shield, User } from 'lucide-react';
+import { ChevronRight, Shield, User, Menu, X } from 'lucide-react';
 
 export default function LandingPage({ onEnter }) {
   const navigate = useNavigate();
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [navOpen, setNavOpen] = useState(false);
 
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const overlayRef = useRef(null);
   const buttonsRef = useRef(null);
+  const navbarRef = useRef(null);
 
   // Background Particle System (Canvas)
   useEffect(() => {
@@ -134,6 +136,51 @@ export default function LandingPage({ onEnter }) {
         backgroundColor: '#020403'
       }}
     >
+      {/* Premium Navbar */}
+      <nav ref={navbarRef} className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-4 flex items-center justify-between" style={{ background: 'rgba(2, 4, 3, 0.75)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(207, 173, 86, 0.12)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFF2B2] via-[#D4AF37] to-[#8A6623] flex items-center justify-center shadow-[0_0_12px_rgba(212,175,55,0.3)]">
+            <span className="text-[#020403] font-bold text-sm">G</span>
+          </div>
+          <span className="font-cinzel text-lg tracking-[0.15em] text-[#D4AF37] font-bold" style={{ fontFamily: "'Great Vibes', cursive", fontSize: '1.5rem' }}>GatherPoint</span>
+        </div>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          <a href="#" className="text-[#D4AF37] text-xs tracking-[0.15em] uppercase font-semibold hover:text-[#FFF2B2] transition-colors">Home</a>
+          <a href="/customer-order" className="text-white/60 text-xs tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors">Menu</a>
+          <a href="#" className="text-white/60 text-xs tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors">Book a Table</a>
+          <button onClick={onEnter} className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] text-[#020403] text-xs tracking-[0.12em] font-bold uppercase hover:bg-[#FFF2B2] transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.25)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+            <Shield size={14} /> Staff Login
+          </button>
+          <button onClick={() => navigate('/customer-order')} className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#D4AF37]/40 text-[#D4AF37] text-xs tracking-[0.12em] font-bold uppercase hover:bg-[#D4AF37]/10 transition-all duration-300">
+            <User size={14} /> Customer
+          </button>
+        </div>
+
+        {/* Mobile Hamburger */}
+        <button className="md:hidden text-white/70 hover:text-[#D4AF37] transition-colors" onClick={() => setNavOpen(!navOpen)}>
+          {navOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Mobile Menu */}
+        {navOpen && (
+          <div className="absolute top-full left-0 right-0 p-6 flex flex-col gap-4" style={{ background: 'rgba(2, 4, 3, 0.95)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(207, 173, 86, 0.12)' }}>
+            <a href="#" className="text-[#D4AF37] text-sm tracking-[0.15em] uppercase font-semibold">Home</a>
+            <a href="/customer-order" className="text-white/60 text-sm tracking-[0.15em] uppercase font-semibold">Menu</a>
+            <a href="#" className="text-white/60 text-sm tracking-[0.15em] uppercase font-semibold">Book a Table</a>
+            <div className="flex flex-col gap-3 mt-2 pt-4 border-t border-[#D4AF37]/10">
+              <button onClick={onEnter} className="flex items-center justify-center gap-2 py-3 rounded-full bg-[#D4AF37] text-[#020403] text-xs tracking-[0.12em] font-bold uppercase">
+                <Shield size={14} /> Staff Login
+              </button>
+              <button onClick={() => navigate('/customer-order')} className="flex items-center justify-center gap-2 py-3 rounded-full border border-[#D4AF37]/40 text-[#D4AF37] text-xs tracking-[0.12em] font-bold uppercase">
+                <User size={14} /> Customer Order
+              </button>
+            </div>
+          </div>
+        )}
+      </nav>
+
       {/* Interactive Floating Gold Particles Layer */}
       <canvas 
         ref={canvasRef}
