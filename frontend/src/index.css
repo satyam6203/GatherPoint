@@ -5,6 +5,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@theme {
+  --color-customer-bg: #071B14;
+  --color-customer-primary: #2D6A4F;
+  --color-customer-accent: #D4A373;
+  --color-customer-text: #FAF8F1;
+}
+
 :root {
   --font-display: 'Outfit', sans-serif;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
