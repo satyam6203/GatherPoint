@@ -61,9 +61,33 @@ public class PublicController {
     }
 
     @PostMapping("/customers")
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer, jakarta.servlet.http.HttpSession session) {
         Customer saved = customerRepo.save(customer);
+        session.setAttribute("customer", saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @PostMapping("/customers/login")
+    public ResponseEntity<?> loginCustomer(@RequestBody com.GatherPoint.backend.dto.Request.LoginRequest request, jakarta.servlet.http.HttpSession session) {
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+        Optional<Customer> customerOpt = customerRepo.findByEmail(request.getEmail());
+        if (customerOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Customer not found with email: " + request.getEmail());
+        }
+        Customer customer = customerOpt.get();
+        session.setAttribute("customer", customer);
+        return ResponseEntity.ok(customer);
+    }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<?> checkAuth(jakarta.servlet.http.HttpSession session) {
+        Customer customer = (Customer) session.getAttribute("customer");
+        if (customer == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+        return ResponseEntity.ok(customer);
     }
 
     @PostMapping("/orders")

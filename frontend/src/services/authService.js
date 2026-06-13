@@ -42,7 +42,7 @@ class AuthService {
       try {
         await this.refreshToken();
         return this.getCurrentUser();
-      } catch (error) {
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         return null;

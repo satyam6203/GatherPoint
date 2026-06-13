@@ -51,7 +51,7 @@ export default function useAuth() {
     };
 
     initAuth();
-  }, [isSignedIn, clerkUser]);
+  }, [isSignedIn, clerkUser, getToken]);
 
   const login = async (email, password, role) => {
     try {

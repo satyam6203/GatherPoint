@@ -1,5 +1,5 @@
 // useApi hook - Generic API calls
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import ApiService from '../services/apiService';
 
 export default function useApi(initialData = null) {
@@ -26,23 +26,23 @@ export default function useApi(initialData = null) {
     const queryString = new URLSearchParams(params).toString();
     const url = `${endpoint}${queryString ? '?' + queryString : ''}`;
     await execute(ApiService.get, url);
-  }, []);
+  }, [execute]);
 
   const post = useCallback(async (endpoint, data) => {
     await execute(ApiService.post, endpoint, data);
-  }, []);
+  }, [execute]);
 
   const put = useCallback(async (endpoint, id, data) => {
     await execute(ApiService.put, endpoint, id, data);
-  }, []);
+  }, [execute]);
 
   const patch = useCallback(async (endpoint, id, data) => {
     await execute(ApiService.patch, endpoint, id, data);
-  }, []);
+  }, [execute]);
 
   const remove = useCallback(async (endpoint, id) => {
     await execute(ApiService.delete, endpoint, id);
-  }, []);
+  }, [execute]);
 
   const reset = useCallback(() => {
     setData(initialData);

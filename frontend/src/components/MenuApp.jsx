@@ -267,7 +267,9 @@ export default function MenuApp() {
           const cust = await custRes.json();
           custId = cust.id;
         }
-      } catch (e) {}
+      } catch {
+        // Fallback: customer lookup/creation failed, order will be placed anonymously
+      }
     }
 
     const payload = {
@@ -292,7 +294,7 @@ export default function MenuApp() {
         const err = await res.text();
         alert('Failed to place order: ' + err);
       }
-    } catch (e) {
+    } catch {
       alert('Could not connect to server');
     }
     setSubmitting(false);

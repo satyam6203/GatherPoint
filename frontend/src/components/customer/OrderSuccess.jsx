@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import confetti from 'canvas-confetti';
 import { CheckCircle, Clock } from 'lucide-react';

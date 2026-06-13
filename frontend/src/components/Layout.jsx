@@ -1,8 +1,7 @@
-import React from 'react';
 import { Outlet } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
-export default function Layout() {
+export default function Layout({ children }) {
   const { user, logout } = useAuth();
 
   const navigation = [
@@ -60,7 +59,7 @@ export default function Layout() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <Outlet />
+        {children || <Outlet />}
       </main>
     </div>
   );

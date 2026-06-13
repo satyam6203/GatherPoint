@@ -60,15 +60,17 @@ const styles = {
   },
   btn: {
     width: '100%',
-    padding: '14px',
-    borderRadius: '12px',
+    padding: '20px 24px',
+    borderRadius: '16px',
     border: 'none',
     background: 'linear-gradient(135deg, #cfad56, #b8943f)',
     color: '#0a100d',
-    fontWeight: 700,
+    fontWeight: 800,
     fontSize: '1rem',
     cursor: 'pointer',
     transition: 'opacity 0.2s',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
   },
   divider: {
     display: 'flex',
@@ -87,19 +89,21 @@ const styles = {
   },
   socialBtn: {
     width: '100%',
-    padding: '12px',
-    borderRadius: '12px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.03)',
+    padding: '20px 24px',
+    borderRadius: '16px',
+    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(255,255,255,0.05)',
     color: '#fff',
     fontSize: '0.95rem',
-    fontWeight: 600,
+    fontWeight: 800,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '10px',
     transition: 'background 0.2s',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
   },
   tabContainer: {
     display: 'flex',
@@ -108,15 +112,17 @@ const styles = {
   },
   tab: {
     flex: 1,
-    padding: '10px',
+    padding: '14px',
     borderRadius: '12px',
     border: '1px solid rgba(255,255,255,0.1)',
     background: 'transparent',
     color: '#8b9691',
     fontSize: '0.9rem',
-    fontWeight: 600,
+    fontWeight: 800,
     cursor: 'pointer',
     transition: 'all 0.2s',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
   },
   activeTab: {
     background: 'rgba(207,173,86,0.15)',
@@ -164,7 +170,7 @@ export default function CustomerLoginApp() {
         const err = await res.text();
         setMessage(err || 'Login failed');
       }
-    } catch (err) {
+    } catch {
       setMessage('Could not connect to server');
     }
     setLoading(false);
@@ -193,7 +199,7 @@ export default function CustomerLoginApp() {
         const err = await res.text();
         setMessage(err || 'Registration failed');
       }
-    } catch (err) {
+    } catch {
       setMessage('Could not connect to server');
     }
     setLoading(false);

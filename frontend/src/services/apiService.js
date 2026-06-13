@@ -19,12 +19,12 @@ class ApiService {
   static async signup(name, email, password, role) {
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password, role }),
     });
     if (!response.ok) {
       const error = await response.text();
-      throw new error(error || 'Registration failed');
+      throw new Error(error || 'Registration failed');
     }
     return response.json();
   }
@@ -539,7 +539,7 @@ class ApiService {
     });
     if (!response.ok) {
       const error = await response.text();
-      throw new error(error || 'Failed to delete order');
+      throw new Error(error || 'Failed to delete order');
     }
     return response.json();
   }

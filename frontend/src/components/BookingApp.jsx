@@ -13,7 +13,7 @@ const checkCustomerAuth = async () => {
       return customer;
     }
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
@@ -142,7 +142,7 @@ export default function BookingApp() {
           // Redirect to login if not authenticated
           window.location.href = '/customer-login.html';
         }
-      } catch (error) {
+      } catch {
         window.location.href = '/customer-login.html';
       } finally {
         setAuthLoading(false);
@@ -191,7 +191,7 @@ export default function BookingApp() {
         const err = await res.text();
         setMessage(err || 'Failed to create booking');
       }
-    } catch (err) {
+    } catch {
       setMessage('Could not connect to server. Please try again.');
     }
     setLoading(false);
@@ -248,7 +248,9 @@ export default function BookingApp() {
       <div style={styles.card}>
         <div style={styles.brand}>
           <div style={styles.brandName}>GatherPoint</div>
-          <div style={styles.tagline}>Reserve your table in seconds</div>
+          <div style={styles.tagline}>
+            {customer ? `Welcome, ${customer.name}! Reserve your table in seconds` : 'Reserve your table in seconds'}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>

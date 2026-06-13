@@ -13,48 +13,69 @@ function KdsApp() {
   const [categories, setCategories] = useState([]);
   const [wsConnected, setWsConnected] = useState(false);
   const [token, setToken] = useState(null);
+  const [now, setNow] = useState(0);
   const wsRef = useRef(null);
 
-  const getAuthToken = useCallback(async () => {
-    try {
-      const t = await getToken();
-      if (t) setToken(t);
-      return t;
-    } catch { return null; }
-  }, [getToken]);
+  // Periodic time updates for pure time calculations
+  useEffect(() => {
+    const activeTimeout = setTimeout(() => {
+      setNow(Date.now());
+    }, 0);
+    const interval = setInterval(() => setNow(Date.now()), 10000);
+    return () => {
+      clearTimeout(activeTimeout);
+      clearInterval(interval);
+    };
+  }, []);
 
   const fetchCategories = useCallback(async () => {
-    const t = await getAuthToken();
-    if (!t) return;
+    if (!token) return;
     try {
       const res = await fetch(`${API_BASE}/categories`, {
-        headers: { 'Authorization': `Bearer ${t}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setCategories(await res.json());
     } catch (e) { console.debug('KDS: categories fetch failed', e); }
-  }, [getAuthToken]);
+  }, [token]);
 
   const fetchTickets = useCallback(async () => {
-    const t = await getAuthToken();
-    if (!t) return;
+    if (!token) return;
     try {
       const res = await fetch(`${API_BASE}/kitchen/orders`, {
-        headers: { 'Authorization': `Bearer ${t}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setTickets(await res.json());
     } catch (e) { console.debug('KDS: tickets fetch failed', e); }
-  }, [getAuthToken]);
+  }, [token]);
 
+  // Handle token load
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      getAuthToken();
-    }
-  }, [isLoaded, isSignedIn, getAuthToken]);
+    let active = true;
+    const loadToken = async () => {
+      if (isLoaded && isSignedIn) {
+        try {
+          const t = await getToken();
+          if (active && t) {
+            setToken(t);
+          }
+        } catch (err) {
+          console.debug('Failed to load token', err);
+        }
+      }
+    };
+    loadToken();
+    return () => {
+      active = false;
+    };
+  }, [isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     if (token) {
-      fetchTickets();
-      fetchCategories();
+      const activeTimeout = setTimeout(() => {
+        fetchTickets();
+        fetchCategories();
+      }, 0);
+      return () => clearTimeout(activeTimeout);
     }
   }, [token, fetchTickets, fetchCategories]);
 
@@ -101,31 +122,28 @@ function KdsApp() {
   }, [fetchTickets]);
 
   const handlePrepareTicket = async (id) => {
-    const t = await getAuthToken();
-    if (!t) return;
+    if (!token) return;
     const res = await fetch(`${API_BASE}/kitchen/orders/${id}/prepare`, {
       method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${t}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) fetchTickets();
   };
 
   const handleCompleteTicket = async (id) => {
-    const t = await getAuthToken();
-    if (!t) return;
+    if (!token) return;
     const res = await fetch(`${API_BASE}/kitchen/orders/${id}/complete`, {
       method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${t}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) fetchTickets();
   };
 
   const handleCompleteItem = async (ticketId, itemId) => {
-    const t = await getAuthToken();
-    if (!t) return;
+    if (!token) return;
     const res = await fetch(`${API_BASE}/kitchen/orders/${ticketId}/items/${itemId}/complete`, {
       method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${t}` }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) fetchTickets();
   };
@@ -137,7 +155,7 @@ function KdsApp() {
 
   const getTimeElapsed = (createdAt) => {
     if (!createdAt) return '';
-    const diff = Date.now() - new Date(createdAt).getTime();
+    const diff = now - new Date(createdAt).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return 'Just now';
     if (mins < 60) return `${mins}m ago`;

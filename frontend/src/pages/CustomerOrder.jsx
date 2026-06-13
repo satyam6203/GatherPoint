@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import HeroSection from '../components/customer/HeroSection';
 import CategoryTabs from '../components/customer/CategoryTabs';
 import ProductCard from '../components/customer/ProductCard';
@@ -93,6 +93,7 @@ const CustomerOrder = () => {
   };
 
   const handleCheckoutConfirm = (formData) => {
+    console.debug('Processing order checkout:', formData);
     // Generate random order ID
     const newOrderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
     setIsCheckoutOpen(false);
