@@ -78,12 +78,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       {/* Logo Area */}
       <div className="h-20 flex items-center justify-between px-6 border-b border-[#D4A373]/20 shrink-0">
         {!isCollapsed && (
-          <h1 className="text-[#D4A373] text-xl font-bold font-serif whitespace-nowrap">
-            BrewBaithak <span className="text-sm font-sans text-gray-400 block -mt-1">Admin Panel</span>
+          <h1 className="text-[#D4A373] text-2xl font-bold font-cinzel tracking-wide whitespace-nowrap">
+            GatherPoint <span className="text-sm font-sans tracking-normal font-medium text-gray-400 block -mt-1">Admin Panel</span>
           </h1>
         )}
         {isCollapsed && (
-          <div className="text-[#D4A373] text-2xl font-bold font-serif mx-auto">BB</div>
+          <div className="text-[#D4A373] text-2xl font-bold font-cinzel mx-auto">GP</div>
         )}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -103,30 +103,30 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 py-6 px-4 space-y-8">
+      <nav className="flex-1 py-8 px-5 space-y-10">
         {menuSections.map((section, idx) => (
           <div key={idx}>
             {!isCollapsed && (
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              <h3 className="text-xs font-bold text-[#D4A373]/70 uppercase tracking-[0.2em] mb-4 px-2">
                 {section.title}
               </h3>
             )}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {section.items.map((item, itemIdx) => (
                 <NavLink
                   key={itemIdx}
                   to={item.path}
                   title={isCollapsed ? item.name : ''}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                    `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
                       isActive 
-                        ? 'bg-[#2D6A4F]/20 text-[#D4A373]' 
-                        : 'text-gray-400 hover:bg-[#2D6A4F]/10 hover:text-white'
+                        ? 'bg-[#2D6A4F]/30 text-[#D4A373] shadow-inner border border-[#D4A373]/10' 
+                        : 'text-gray-400 hover:bg-[#2D6A4F]/15 hover:text-[#FAF8F1]'
                     }`
                   }
                 >
-                  <item.icon size={20} className="shrink-0" />
-                  {!isCollapsed && <span className="font-medium">{item.name}</span>}
+                  <item.icon size={22} className="shrink-0" />
+                  {!isCollapsed && <span className="font-semibold tracking-wide text-[15px]">{item.name}</span>}
                 </NavLink>
               ))}
             </div>

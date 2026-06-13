@@ -7,20 +7,6 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendValue, prefix = '', s
   const numberRef = useRef(null);
 
   useEffect(() => {
-    // Reveal Animation
-    gsap.fromTo(cardRef.current, 
-      { opacity: 0, y: 30 }, 
-      { opacity: 1, y: 0, duration: 0.8, delay, ease: 'power3.out' }
-    );
-
-    // Hover Animation
-    const card = cardRef.current;
-    const hoverIn = () => gsap.to(card, { y: -5, scale: 1.02, duration: 0.3, ease: 'power2.out', boxShadow: '0 10px 25px -5px rgba(212, 163, 115, 0.1)' });
-    const hoverOut = () => gsap.to(card, { y: 0, scale: 1, duration: 0.3, ease: 'power2.out', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' });
-    
-    card.addEventListener('mouseenter', hoverIn);
-    card.addEventListener('mouseleave', hoverOut);
-
     // Count Up Animation
     const obj = { val: 0 };
     gsap.to(obj, {
@@ -30,15 +16,10 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendValue, prefix = '', s
       ease: 'power3.out',
       onUpdate: () => {
         if (numberRef.current) {
-          numberRef.current.innerText = Math.floor(obj.val).toLocaleString();
+          numberRef.current.innerText = Math.floor(obj.val).toLocaleString('en-IN');
         }
       }
     });
-
-    return () => {
-      card.removeEventListener('mouseenter', hoverIn);
-      card.removeEventListener('mouseleave', hoverOut);
-    };
   }, [value, delay]);
 
   const isPositive = trend === 'up';
@@ -46,10 +27,10 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendValue, prefix = '', s
   return (
     <div 
       ref={cardRef}
-      className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl p-6 hover:border-[#D4A373]/50 hover:bg-[#0A261C]/70 transition-all duration-300"
+      className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-[24px] p-6 hover:border-[#D4A373]/50 hover:bg-[#0A261C]/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_0_rgba(0,0,0,0.4)] group"
     >
       <div className="flex justify-between items-start mb-4">
-        <div className="h-12 w-12 rounded-xl bg-[#2D6A4F]/20 flex items-center justify-center text-[#D4A373]">
+        <div className="h-12 w-12 rounded-xl bg-[#2D6A4F]/20 flex items-center justify-center text-[#D4A373] group-hover:scale-110 transition-transform duration-300">
           <Icon size={24} />
         </div>
         <div className={`flex items-center gap-1 text-sm font-medium px-2.5 py-1 rounded-full ${
@@ -61,9 +42,11 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendValue, prefix = '', s
       </div>
       
       <div>
-        <h3 className="text-gray-400 text-sm font-medium mb-1">{title}</h3>
+        <h3 className="text-gray-400 font-medium text-sm mb-1 tracking-wide">{title}</h3>
         <div className="text-3xl font-bold text-[#FAF8F1] flex items-baseline gap-1">
-          {prefix}<span ref={numberRef}>0</span>{suffix}
+          <span>{prefix}</span>
+          <span ref={numberRef}>0</span>
+          <span>{suffix}</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { Bell, Search, Moon, Sun, User } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 
 const Topbar = () => {
@@ -37,22 +37,30 @@ const Topbar = () => {
         </div>
       </div>
 
-      {/* Right Actions */}
-      <div className="flex items-center gap-6 ml-4">
-        <button className="relative text-gray-400 hover:text-[#D4A373] transition-colors">
+      {/* Right Side Icons */}
+      <div className="flex items-center gap-6">
+        
+        {/* Theme Toggle */}
+        <button className="text-gray-400 hover:text-[#D4A373] transition-colors p-2 rounded-full hover:bg-[#D4A373]/10">
+          <Moon size={22} />
+        </button>
+
+        {/* Notification Bell */}
+        <button className="relative text-gray-400 hover:text-[#D4A373] transition-colors p-2 rounded-full hover:bg-[#D4A373]/10">
           <Bell size={22} />
-          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#0A261C]"></span>
+          <span className="absolute top-1.5 right-1.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-[#0A261C]"></span>
         </button>
         
-        <div className="h-8 w-px bg-[#D4A373]/30"></div>
+        <div className="h-8 w-px bg-[#D4A373]/30 mx-2"></div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
-            <div className="text-sm font-medium text-[#FAF8F1]">{user?.name || 'Admin User'}</div>
-            <div className="text-xs text-gray-400">{user?.role || 'Administrator'}</div>
+        {/* Profile Avatar */}
+        <div className="flex items-center gap-3 cursor-pointer group">
+          <div className="text-right hidden sm:block group-hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#FAF8F1]">{user?.name || 'Admin User'}</p>
+            <p className="text-xs text-[#D4A373]">Super Admin</p>
           </div>
-          <div className="h-10 w-10 rounded-full bg-[#2D6A4F] flex items-center justify-center text-[#D4A373] border border-[#D4A373]/30">
-            <User size={20} />
+          <div className="h-10 w-10 rounded-full bg-[#2D6A4F] border-2 border-[#D4A373]/50 flex items-center justify-center text-white font-bold overflow-hidden shadow-lg group-hover:scale-105 transition-transform">
+            {user?.name ? user.name.charAt(0).toUpperCase() : <User size={20} />}
           </div>
         </div>
       </div>

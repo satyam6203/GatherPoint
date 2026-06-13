@@ -10,7 +10,7 @@ const AdminLayout = () => {
     <div 
       className="flex h-screen text-[#FAF8F1] overflow-hidden relative"
       style={{
-        backgroundImage: "url('/admin-bg.jpg')",
+        backgroundImage: "url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -28,9 +28,8 @@ const AdminLayout = () => {
 
       {/* Main Content Wrapper */}
       <div 
-        className={`flex flex-col flex-1 transition-all duration-300 ease-in-out z-10 ${
-          isSidebarCollapsed ? 'ml-[80px]' : 'ml-[280px]'
-        }`}
+        className="flex flex-col flex-1 transition-all duration-300 ease-in-out z-10 overflow-hidden"
+        style={{ marginLeft: isSidebarCollapsed ? '80px' : '280px' }}
       >
         {/* Top Navbar */}
         <Topbar />

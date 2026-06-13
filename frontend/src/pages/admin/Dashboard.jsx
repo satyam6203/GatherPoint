@@ -1,9 +1,36 @@
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { ShoppingBag, DollarSign, Users, Utensils } from 'lucide-react';
 import StatsCard from '../../components/admin/StatsCard';
 import OrdersTable from '../../components/admin/OrdersTable';
 import ProductList from '../../components/admin/ProductList';
+import CafeFloorStatus from '../../components/admin/CafeFloorStatus';
+import QuickActions from '../../components/admin/QuickActions';
 
 const Dashboard = () => {
+  const [time, setTime] = useState(new Date());
+  const dashboardRef = useRef(null);
+
+  useEffect(() => {
+    // Live Clock
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    
+    // Entrance Animation
+    gsap.fromTo(
+      dashboardRef.current.children,
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+    );
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  };
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
   // Dummy Data
   const recentOrders = [
     { id: '1042', customer: 'Rahul Sharma', table: '4', amount: 850, status: 'Completed' },
@@ -23,11 +50,17 @@ const Dashboard = () => {
   const chartData = [40, 70, 45, 90, 65, 85, 120];
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#FAF8F1] font-serif">Dashboard Overview</h1>
-        <p className="text-gray-400 text-sm mt-1">Welcome back to BrewBaithak admin panel.</p>
+    <div ref={dashboardRef} className="space-y-8 pb-12">
+      {/* SECTION 1: Header & Clock */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 bg-[#0A261C]/40 backdrop-blur-sm p-6 rounded-[24px] border border-[#D4A373]/10">
+        <div>
+          <h1 className="text-3xl font-bold text-[#FAF8F1] font-serif tracking-wide">Good Morning, Admin</h1>
+          <p className="text-gray-400 text-sm mt-2 tracking-wide">Manage your cafe operations from one central hub.</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[#D4A373] font-semibold tracking-widest uppercase text-sm mb-1">{formatDate(time)}</p>
+          <p className="text-2xl font-bold font-serif text-[#FAF8F1] tracking-wider">{formatTime(time)}</p>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -68,21 +101,24 @@ const Dashboard = () => {
         />
       </div>
 
+      {/* SECTION 7: Quick Actions */}
+      <QuickActions />
+
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         
         {/* Left Column (Chart + Orders) */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-8">
           
-          {/* Sales Analytics Chart (CSS Dummy) */}
-          <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] p-6 rounded-2xl">
+          {/* SECTION 6: Sales Analytics Chart (CSS Dummy) */}
+          <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] p-6 rounded-[24px]">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-[#FAF8F1] font-semibold font-serif text-lg">Sales Analytics</h2>
-              <select className="bg-[#071B14] border border-[#2D6A4F]/50 text-gray-300 text-sm rounded-lg px-3 py-1 outline-none">
-                <option>This Week</option>
-                <option>This Month</option>
-                <option>This Year</option>
-              </select>
+              <h2 className="text-[#FAF8F1] font-semibold font-serif text-xl tracking-wide">Revenue Trend</h2>
+              <div className="flex gap-2 bg-[#071B14] p-1 rounded-lg border border-[#D4A373]/20">
+                <button className="px-3 py-1 text-xs font-medium bg-[#2D6A4F]/40 text-[#D4A373] rounded-md">Daily</button>
+                <button className="px-3 py-1 text-xs font-medium text-gray-400 hover:text-white">Weekly</button>
+                <button className="px-3 py-1 text-xs font-medium text-gray-400 hover:text-white">Monthly</button>
+              </div>
             </div>
             
             <div className="h-64 w-full flex items-end justify-between gap-2 md:gap-4 mt-8 px-2 md:px-6">
@@ -102,25 +138,33 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Recent Orders */}
-          <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-2xl">
-            <div className="p-6 border-b border-[#2D6A4F]/30 flex justify-between items-center">
-              <h2 className="text-[#FAF8F1] font-semibold font-serif text-lg">Recent Orders</h2>
-              <button className="text-[#D4A373] hover:text-white text-sm font-medium transition-colors">
+          {/* SECTION 4: Recent Orders */}
+          <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-[24px]">
+            <div className="p-6 border-b border-[#D4A373]/10 flex justify-between items-center">
+              <h2 className="text-[#FAF8F1] font-semibold font-serif text-xl tracking-wide">Recent Orders</h2>
+              <button className="text-[#D4A373] hover:text-white text-sm font-medium transition-colors hover:underline">
                 View All
               </button>
             </div>
-            <OrdersTable orders={recentOrders} />
+            <div className="p-2">
+              <OrdersTable orders={recentOrders} />
+            </div>
           </div>
 
         </div>
 
-        {/* Right Column (Top Products) */}
-        <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] p-6 rounded-2xl h-fit">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-[#FAF8F1] font-semibold font-serif text-lg">Top Products</h2>
+        {/* Right Column (Floor + Products) */}
+        <div className="space-y-8">
+          {/* SECTION 3: Cafe Floor Status */}
+          <CafeFloorStatus />
+
+          {/* SECTION 5: Top Products */}
+          <div className="bg-[#0A261C]/60 backdrop-blur-md border border-[#D4A373]/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] p-6 rounded-[24px] h-fit">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-[#FAF8F1] font-semibold font-serif text-xl tracking-wide">Top Products</h2>
+            </div>
+            <ProductList products={topProducts} />
           </div>
-          <ProductList products={topProducts} />
         </div>
 
       </div>

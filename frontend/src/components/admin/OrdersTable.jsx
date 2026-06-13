@@ -1,6 +1,15 @@
 
 
 const OrdersTable = ({ orders }) => {
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'Completed': return <span className="px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-semibold tracking-wider uppercase border border-green-500/20">Completed</span>;
+      case 'Preparing': return <span className="px-3 py-1 bg-[#D4A373]/10 text-[#D4A373] rounded-full text-xs font-semibold tracking-wider uppercase border border-[#D4A373]/20">Preparing</span>;
+      case 'Pending': return <span className="px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-semibold tracking-wider uppercase border border-yellow-500/20">Pending</span>;
+      case 'Cancelled': return <span className="px-3 py-1 bg-red-500/10 text-red-400 rounded-full text-xs font-semibold tracking-wider uppercase border border-red-500/20">Cancelled</span>;
+      default: return <span className="px-3 py-1 bg-gray-500/10 text-gray-400 rounded-full text-xs font-semibold tracking-wider uppercase border border-gray-500/20">{status}</span>;
+    }
+  };
   
   const getStatusColor = (status) => {
     switch(status.toLowerCase()) {
@@ -33,11 +42,11 @@ const OrdersTable = ({ orders }) => {
               <td className="px-6 py-4 text-[#FAF8F1] font-medium">#{order.id}</td>
               <td className="px-6 py-4 text-gray-300">{order.customer}</td>
               <td className="px-6 py-4 text-gray-300">T-{order.table}</td>
-              <td className="px-6 py-4 text-[#D4A373] font-medium">₹{order.amount}</td>
-              <td className="px-6 py-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                  {order.status}
-                </span>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#FAF8F1]">
+                ₹{order.amount}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {getStatusBadge(order.status)}
               </td>
             </tr>
           ))}
