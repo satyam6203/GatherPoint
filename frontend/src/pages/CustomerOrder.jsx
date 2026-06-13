@@ -58,7 +58,7 @@ const menuData = [
   { id: 30, category: 'Appetizers', productName: 'Bruschetta',             description: 'Toasted bread with fresh tomato and basil.',          price: 220, imageUrl: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?q=80&w=600&auto=format&fit=crop', rating: '4.5', prepTime: '10 mins', calories: '220 kcal' },
 
   // Smoothies
-  { id: 31, category: 'Smoothies',  productName: 'Berry Blast',            description: 'Mixed wild berries and yogurt blend.',               price: 200, imageUrl: 'https://images.unsplash.com/photo-1553530666-ba11a90a3f88?q=80&w=600&auto=format&fit=crop', rating: '4.8', prepTime: '5 mins',  calories: '180 kcal' },
+  { id: 31, category: 'Smoothies',  productName: 'Berry Blast',            description: 'Mixed wild berries and yogurt blend.',               price: 200, imageUrl: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?q=80&w=600&auto=format&fit=crop', rating: '4.8', prepTime: '5 mins',  calories: '180 kcal' },
   { id: 32, category: 'Smoothies',  productName: 'Mango Tango',            description: 'Alphonso mango, banana and coconut milk blend.',      price: 220, imageUrl: 'https://images.unsplash.com/photo-1502741224143-90386d7f8c82?q=80&w=600&auto=format&fit=crop', rating: '4.9', prepTime: '5 mins',  calories: '210 kcal' },
 ];
 
