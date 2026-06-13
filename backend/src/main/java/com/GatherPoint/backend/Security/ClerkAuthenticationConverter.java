@@ -23,10 +23,12 @@ public class ClerkAuthenticationConverter implements Converter<Jwt, UsernamePass
 
     @Override
     public UsernamePasswordAuthenticationToken convert(Jwt jwt) {
-        // Clerk puts email inside the "email" claim or standard claims
+        // Clerk puts email inside various claims depending on configuration
         String email = jwt.getClaimAsString("email");
         if (email == null) {
-            // Check other potential email claims in Clerk token or fallback to subject
+            email = jwt.getClaimAsString("https://clerk/email");
+        }
+        if (email == null) {
             email = jwt.getClaimAsString("sub");
         }
 
