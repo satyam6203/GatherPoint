@@ -68,6 +68,8 @@ function App() {
   const [upiConfirmed, setUpiConfirmed] = useState(false);
   const [customerModal, setCustomerModal] = useState(false);
   const [couponModal, setCouponModal] = useState(false);
+  const [isAddingTable, setIsAddingTable] = useState(false);
+  const [newTableSeats, setNewTableSeats] = useState(4);
 
   // KDS State
   const [kdsSearch, setKdsSearch] = useState('');
@@ -149,6 +151,82 @@ function App() {
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  // Render Table Graphics
+  const renderTableChairs = (table) => {
+    const chairs = [];
+    const isRound = table.tableNumber % 2 === 0;
+    
+    if (isRound) {
+      for (let i = 0; i < table.seats; i++) {
+        const angle = (i * 360) / table.seats;
+        chairs.push(
+          <rect key={i} x="42" y="0" width="16" height="12" rx="6" fill="#2a5038" transform={`rotate(${angle}, 50, 35)`} />
+        );
+      }
+      return (
+        <svg width="100" height="70" viewBox="0 0 100 70">
+          {chairs}
+          <circle cx="50" cy="35" r="26" fill="#cfad56" stroke="#8a6623" strokeWidth="2"/>
+          <circle cx="50" cy="35" r="3" fill="#8a6623"/>
+        </svg>
+      );
+    } else {
+      const topCount = Math.ceil(table.seats / 2);
+      const bottomCount = Math.floor(table.seats / 2);
+      
+      for (let i = 0; i < topCount; i++) {
+        const spacing = 70 / topCount;
+        const xPos = 15 + (spacing * i) + (spacing / 2) - 8;
+        chairs.push(<rect key={`t${i}`} x={xPos} y="0" width="16" height="12" rx="6" fill="#2a5038" />);
+      }
+      for (let i = 0; i < bottomCount; i++) {
+        const spacing = 70 / bottomCount;
+        const xPos = 15 + (spacing * i) + (spacing / 2) - 8;
+        chairs.push(<rect key={`b${i}`} x={xPos} y="58" width="16" height="12" rx="6" fill="#2a5038" />);
+      }
+      
+      return (
+        <svg width="100" height="70" viewBox="0 0 100 70">
+          {chairs}
+          <rect x="15" y="10" width="70" height="50" rx="8" fill="#cfad56" stroke="#8a6623" strokeWidth="2"/>
+          <circle cx="50" cy="35" r="3" fill="#8a6623"/>
+        </svg>
+      );
+    }
+  };
+
+  // Add Table Handler
+  const handleAddTable = (e) => {
+    if (e) e.stopPropagation();
+    if (!selectedFloor) {
+      showToast('Please select a floor first.', 'error');
+      setIsAddingTable(false);
+      return;
+    }
+    
+    const seats = parseInt(newTableSeats, 10);
+    if (isNaN(seats) || seats <= 0) {
+      showToast('Invalid number of seats entered.', 'error');
+      return;
+    }
+
+    const maxTableId = tables.reduce((max, t) => Math.max(max, t.id), 0);
+    const maxTableNum = tables.reduce((max, t) => Math.max(max, t.tableNumber), 0);
+    
+    const newTable = {
+      id: maxTableId + 1,
+      tableNumber: maxTableNum + 1,
+      seats: seats,
+      active: true,
+      floor: { id: selectedFloor.id }
+    };
+    
+    setTables([...tables, newTable]);
+    showToast(`Table ${newTable.tableNumber} added with ${seats} seats`, 'success');
+    setIsAddingTable(false);
+    setNewTableSeats(4);
   };
 
   // Generic Request Helper
@@ -933,7 +1011,6 @@ function App() {
       {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <Coffee size={28} style={{ color: '#6366f1' }} />
           <span>GatherPoint</span>
         </div>
 
@@ -1016,39 +1093,51 @@ function App() {
       </aside>
 
       {/* Main Screen Content Router */}
-      <main className="main-content">
+      <main className={`main-content ${activeTab === 'pos' ? 'pos-mode' : ''}`}>
         
         {/* POS TERMINAL TAB */}
         {activeTab === 'pos' && (
           <div>
             {/* Header info */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
               <div>
-                <h1 style={{ fontSize: '2rem', marginBottom: '6px' }}>POS Terminal</h1>
+                <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', fontFamily: 'var(--font-cinzel)', fontWeight: 'bold' }}>POS Terminal</h1>
+                <p style={{ color: '#8b9691', marginBottom: '15px' }}>Select a table to start taking orders</p>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <span className="badge badge-primary">
-                    Employee: {user?.name}
+                  <span className="badge" style={{ background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
+                    <User size={12} style={{ display: 'inline', marginRight: '4px' }}/> EMPLOYEE: {user?.name || 'CLERK USER'}
                   </span>
                   {activeSession ? (
-                    <span className="badge badge-success" style={{ cursor: 'pointer' }} onClick={() => { setSessionActionType('close'); setSessionModal(true); }}>
-                      Session Active (Close)
+                    <span className="badge" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171', border: '1px solid rgba(248, 113, 113, 0.2)', cursor: 'pointer' }} onClick={() => { setSessionActionType('close'); setSessionModal(true); }}>
+                      <span className="pos-status-dot occupied" style={{ display: 'inline-block', marginRight: '6px' }}></span> SESSION ACTIVE (CLOSE)
                     </span>
                   ) : (
-                    <span className="badge badge-danger" style={{ cursor: 'pointer' }} onClick={() => { setSessionActionType('open'); setSessionModal(true); }}>
-                      No Active Session (Open)
+                    <span className="badge" style={{ background: 'rgba(248, 113, 113, 0.1)', color: '#f87171', border: '1px solid rgba(248, 113, 113, 0.2)', cursor: 'pointer' }} onClick={() => { setSessionActionType('open'); setSessionModal(true); }}>
+                      <span className="pos-status-dot occupied" style={{ display: 'inline-block', marginRight: '6px' }}></span> NO ACTIVE SESSION (OPEN)
                     </span>
                   )}
                 </div>
               </div>
 
+              {/* Time Widget */}
+              {!selectedTable && (
+                <div className="pos-datetime-widget">
+                  <Clock size={24} color="#8b9691" />
+                  <div>
+                    <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#fff' }}>{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8b9691' }}>{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  </div>
+                </div>
+              )}
+
               {/* Table details */}
               {selectedTable && (
-                <div className="glass-panel" style={{ padding: '10px 20px', borderLeft: '4px solid var(--accent)', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <div className="glass-panel" style={{ padding: '10px 20px', borderLeft: '4px solid #cfad56', display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Selected Location</div>
-                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{selectedFloor?.name} - Table {selectedTable.tableNumber}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8b9691' }}>Selected Location</div>
+                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#cfad56' }}>{selectedFloor?.name} - Table {selectedTable.tableNumber}</div>
                   </div>
-                  <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }} onClick={() => setSelectedTable(null)}>
+                  <button className="pos-floor-btn" onClick={() => setSelectedTable(null)}>
                     Change
                   </button>
                 </div>
@@ -1058,39 +1147,94 @@ function App() {
             {/* SCREEN 1: FLOOR & TABLE SELECTION */}
             {!selectedTable ? (
               <div>
-                <h2 style={{ fontSize: '1.4rem', marginBottom: '20px', color: 'var(--text-secondary)' }}>Select Table Layout</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.5 4.5C8.01472 4.5 6 6.51472 6 9C6 11.4853 8.01472 13.5 10.5 13.5C12.9853 13.5 15 11.4853 15 9C15 6.51472 12.9853 4.5 10.5 4.5Z" stroke="#cfad56" strokeWidth="1.5"/>
+                    <path d="M12.5 11L18 16.5" stroke="#cfad56" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-cinzel)', color: '#fff', fontWeight: 600 }}>Select Table Layout</h2>
+                  <div style={{ flexGrow: 1, height: '1px', background: 'linear-gradient(to right, #cfad56, transparent)' }}></div>
+                </div>
                 
-                {/* Floor tabs */}
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                {/* Controls Bar */}
+                <div className="pos-controls-bar">
                   {floors.map(floor => (
                     <button 
                       key={floor.id} 
-                      className={`btn ${selectedFloor?.id === floor.id ? 'btn-primary' : 'btn-secondary'}`}
+                      className={`pos-floor-btn ${selectedFloor?.id === floor.id ? 'active' : ''}`}
                       onClick={() => setSelectedFloor(floor)}
                     >
                       <MapPin size={16} /> {floor.name}
                     </button>
                   ))}
+                  
+                  <div className="pos-search-wrapper">
+                    <Search size={16} className="pos-search-icon" />
+                    <input type="text" placeholder="Search table..." className="pos-search-input" />
+                  </div>
+                  
+                  <button className="pos-filter-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>
+                    All Status
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
                 </div>
 
                 {/* Grid of Tables */}
-                <div className="glass-panel" style={{ padding: '40px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '30px', justifyItems: 'center' }}>
-                    {tables.filter(t => t.floor.id === selectedFloor?.id).map(table => {
-                      // Check if table has active order in local list
-                      const isOccupied = orders.some(o => o.table?.id === table.id && o.status === 'DRAFT');
-                      return (
-                        <div 
-                          key={table.id}
-                          className={`table-node ${isOccupied ? 'occupied' : 'available'}`}
-                          onClick={() => setSelectedTable(table)}
-                        >
-                          <span style={{ fontSize: '1.8rem', marginBottom: '6px' }}>🍽️</span>
-                          <span style={{ fontWeight: '800', fontSize: '1.1rem' }}>T - {table.tableNumber}</span>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{table.seats} Seats</span>
+                <div className="pos-table-grid">
+                  {tables.filter(t => t.floor.id === selectedFloor?.id).map(table => {
+                    const isOccupied = orders.some(o => o.table?.id === table.id && o.status === 'DRAFT');
+                    return (
+                      <div 
+                        key={table.id}
+                        className={`pos-table-card ${isOccupied ? 'occupied' : 'available'}`}
+                        onClick={() => setSelectedTable(table)}
+                      >
+                        <div className="pos-table-title">T-{table.tableNumber}</div>
+                        <div className="pos-table-seats">{table.seats} Seats</div>
+                        
+                        <div className="pos-table-graphic-container">
+                          {renderTableChairs(table)}
                         </div>
-                      );
-                    })}
+                        
+                        <div className={`pos-table-status ${isOccupied ? 'occupied' : 'available'}`}>
+                          <span className={`pos-status-dot ${isOccupied ? 'occupied' : 'available'}`}></span>
+                          {isOccupied ? 'Occupied' : 'Available'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Add Table Card */}
+                  <div className="pos-table-card add-table" onClick={() => !isAddingTable && setIsAddingTable(true)} style={{ cursor: isAddingTable ? 'default' : 'pointer' }}>
+                    {isAddingTable ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '15px' }}>
+                        <span style={{ color: '#cfad56', fontWeight: 600 }}>Seats:</span>
+                        <input 
+                          type="number" 
+                          value={newTableSeats} 
+                          onChange={(e) => setNewTableSeats(e.target.value)}
+                          style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #cfad56', background: 'transparent', color: '#fff', textAlign: 'center', outline: 'none' }}
+                          min="1"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleAddTable(e);
+                            if (e.key === 'Escape') setIsAddingTable(false);
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                          <button onClick={(e) => { e.stopPropagation(); setIsAddingTable(false); }} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #4a5568', color: '#8b9691', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}>Cancel</button>
+                          <button onClick={handleAddTable} style={{ padding: '6px 12px', background: '#cfad56', color: '#0a100d', border: 'none', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer' }}>Add</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#cfad56', gap: '15px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid #cfad56', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Plus size={24} />
+                        </div>
+                        <span style={{ fontSize: '0.9rem', color: '#8b9691' }}>Add Table</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
