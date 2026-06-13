@@ -37,7 +37,7 @@ const ProductCard = ({ product, onAdd }) => {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative rounded-2xl h-[26rem] overflow-hidden cursor-pointer border border-white/10 hover:border-customer-accent/60 transition-colors duration-500 bg-black/30"
+      className="relative mx-auto w-[94%] max-w-[320px] rounded-2xl h-[23rem] overflow-hidden cursor-pointer border border-white/10 hover:border-customer-accent/60 transition-colors duration-500 bg-black/30"
     >
       {/* Background Image */}
       <motion.img
@@ -62,15 +62,15 @@ const ProductCard = ({ product, onAdd }) => {
         initial={{ opacity: 0, x: -10 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="absolute top-4 left-4 bg-customer-accent/90 text-customer-bg text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider"
+        className="absolute top-4 left-4 bg-customer-accent/90 text-customer-bg text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap"
       >
         {product.category}
       </motion.span>
 
       {/* Default name */}
-      <div ref={nameRef} className="absolute inset-x-0 bottom-0 p-6">
+      <div ref={nameRef} className="absolute inset-x-0 bottom-0 px-8 py-8 text-center flex flex-col items-center">
         <h3 className="text-2xl font-bold text-white drop-shadow-lg">{product.productName}</h3>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center justify-center gap-2 mt-1">
           <Star size={13} className="text-yellow-400 fill-yellow-400" />
           <span className="text-white/80 text-sm font-semibold">{rating}</span>
           <span className="text-white/40 text-xs ml-1">· ₹{product.price}</span>
@@ -78,22 +78,22 @@ const ProductCard = ({ product, onAdd }) => {
       </div>
 
       {/* Hover content */}
-      <div ref={contentRef} className="absolute inset-0 flex flex-col justify-end p-6 opacity-0">
+      <div ref={contentRef} className="absolute inset-0 flex flex-col justify-end items-center text-center px-8 py-6 opacity-0">
         <span className="text-customer-accent text-xs font-bold uppercase tracking-widest mb-1">{product.category}</span>
-        <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{product.productName}</h3>
+        <h3 className="text-[1.35rem] font-bold text-white mb-1 leading-tight">{product.productName}</h3>
 
         {/* Stars */}
-        <div className="flex items-center gap-1 mb-3">
+        <div className="flex items-center justify-center gap-1 mb-2">
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={12} className={i < Math.floor(parseFloat(rating)) ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'} />
           ))}
           <span className="text-white/70 text-xs ml-1">{rating}</span>
         </div>
 
-        <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-2">{product.description}</p>
+        <p className="text-white/70 text-sm leading-relaxed mb-3 line-clamp-2">{product.description}</p>
 
         {/* Meta */}
-        <div className="flex gap-4 mb-5">
+        <div className="flex justify-center gap-4 mb-3">
           <div className="flex items-center gap-1 text-white/60 text-xs">
             <Clock size={12} /><span>{prepTime}</span>
           </div>
@@ -102,17 +102,19 @@ const ProductCard = ({ product, onAdd }) => {
           </div>
         </div>
 
-        {/* Price + Add */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-white/40 uppercase tracking-wider">Price</p>
-            <p className="text-2xl font-bold text-customer-accent">₹{product.price}</p>
-          </div>
+        {/* Price */}
+        <div className="mb-2">
+          <p className="text-xs text-white/40 uppercase tracking-wider mb-0.5">Price</p>
+          <p className="text-2xl font-bold text-customer-accent">₹{product.price}</p>
+        </div>
+
+        {/* Add To Cart Button */}
+        <div className="flex justify-center w-full mt-1 mb-8">
           <motion.button
             whileTap={{ scale: 0.92 }}
             whileHover={{ scale: 1.05 }}
             onClick={(e) => { e.stopPropagation(); onAdd(product); }}
-            className="flex items-center gap-2 px-5 py-3 bg-customer-accent text-customer-bg font-bold rounded-xl hover:shadow-[0_0_20px_rgba(212,163,115,0.6)] transition-shadow"
+            className="flex items-center justify-center w-[75%] gap-2 px-4 py-3 bg-customer-accent text-customer-bg font-bold rounded-xl hover:shadow-[0_0_20px_rgba(212,163,115,0.6)] transition-shadow whitespace-nowrap"
           >
             <Plus size={18} /> Add To Cart
           </motion.button>
