@@ -135,16 +135,18 @@ const CustomerOrder = () => {
             return rows.map((row, index) => (
               <div 
                 key={index} 
-                className="w-full flex flex-wrap justify-center items-start gap-6 md:gap-10 mb-8 md:mb-12 mx-auto"
+                className={`w-full xl:w-max mx-auto grid gap-6 md:gap-10 mb-8 md:mb-12 justify-items-center ${
+                  row.length === 4 ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4' : 
+                  row.length === 3 ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 
+                  row.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                }`}
               >
                 {row.map(product => (
                   <div 
                     key={product.id} 
-                    className="flex justify-center w-full sm:w-auto"
+                    className="w-full sm:w-[320px] lg:w-[350px]"
                   >
-                    <div className="w-full sm:w-[320px] lg:w-[360px]">
-                      <ProductCard product={product} onAdd={addToCart} />
-                    </div>
+                    <ProductCard product={product} onAdd={addToCart} />
                   </div>
                 ))}
               </div>
