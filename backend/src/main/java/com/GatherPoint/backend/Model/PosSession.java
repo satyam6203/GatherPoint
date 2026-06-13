@@ -1,11 +1,13 @@
 package com.GatherPoint.backend.Model;
 
-import com.GatherPoint.backend.Constants.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,19 +15,16 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
-
+public class PosSession {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
-    private String name;
+    private LocalDateTime openedAt;
+    private LocalDateTime closedAt;
 
-    private String email;
+    private BigDecimal openingAmount;
+    private BigDecimal closingAmount;
 
-    private String password;
-
-    private Role role;
-
-    private boolean active;
+    private User employee;
 }

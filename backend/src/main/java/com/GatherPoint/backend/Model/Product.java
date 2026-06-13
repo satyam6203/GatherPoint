@@ -1,31 +1,32 @@
 package com.GatherPoint.backend.Model;
 
-import com.GatherPoint.backend.Constants.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class User {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    private String name;
+    private String ProductName;
 
-    private String email;
+    private int price;
 
-    private String password;
+    private String description;
 
-    private Role role;
+    private int tax;
 
-    private boolean active;
+    private Category category;
 }
