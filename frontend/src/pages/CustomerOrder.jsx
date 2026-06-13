@@ -6,7 +6,7 @@ import CheckoutModal from '../components/customer/CheckoutModal';
 import ProductDetailModal from '../components/customer/ProductDetailModal';
 import OrderSuccess from '../components/customer/OrderSuccess';
 import Logo from '../components/customer/Logo';
-import { ShoppingBag, ChevronDown } from 'lucide-react';
+import { ShoppingBag, ChevronDown, BookOpen, CreditCard, Trash2, Plus, Minus, Smartphone, Banknote, ArrowRight } from 'lucide-react';
 
 // Deduplicated menu — each item has a unique image
 const menuData = [
@@ -71,6 +71,13 @@ const CustomerOrder = () => {
   const [heroVisible, setHeroVisible] = useState(true);
   const [detailProduct, setDetailProduct] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('product');
+  const [checkoutForm, setCheckoutForm] = useState({
+    name: '',
+    phone: '',
+    instructions: '',
+    payment: 'UPI'
+  });
   const menuRef = useRef(null);
 
   const openProductDetail = (product) => {
@@ -106,12 +113,216 @@ const CustomerOrder = () => {
     console.debug('Checkout:', formData);
     const newOrderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
     setIsCheckoutOpen(false);
-    setTimeout(() => { setOrderSuccessId(newOrderId); setCart([]); }, 400);
+    setActiveTab('product');
+    setTimeout(() => { 
+      setOrderSuccessId(newOrderId); 
+      setCart([]); 
+      setCheckoutForm({ name: '', phone: '', instructions: '', payment: 'UPI' });
+    }, 400);
   };
 
   const filteredMenu = selectedCategory === 'All'
     ? menuData
     : menuData.filter(item => item.category === selectedCategory);
+
+  const renderMobileCart = () => {
+    return (
+      <div className="md:hidden w-full px-6 py-8 pb-32">
+        <h2 className="text-3xl font-cinzel font-bold text-customer-accent mb-6 flex items-center gap-3">
+          <ShoppingBag size={28} />
+          Your Order
+        </h2>
+
+        {cart.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-customer-text/50">
+            <ShoppingBag size={64} className="mb-4 opacity-20" />
+            <p className="text-lg font-sans">Your cart is empty.</p>
+            <button 
+              onClick={() => setActiveTab('product')} 
+              className="mt-4 text-customer-accent hover:underline font-bold"
+            >
+              Start browsing
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              {cart.map(item => (
+                <div 
+                  key={item.id} 
+                  className="flex gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 relative group hover:border-customer-accent/30 transition-colors animate-fadeIn"
+                >
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/5">
+                    {item.imageUrl && item.imageUrl.length > 5 && item.imageUrl.startsWith('http') ? (
+                      <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-3xl">☕</div>
+                    )}
+                  </div>
+                  <div className="flex-grow flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-customer-text font-sans text-left">{item.productName}</h4>
+                      <p className="text-sm text-customer-text/60 text-left">₹{item.price}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 bg-black/40 rounded-full px-2.5 py-1">
+                        <button 
+                          onClick={() => updateQuantity(item, -1)} 
+                          className="p-1 text-customer-text hover:text-customer-accent transition-colors"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="text-sm font-bold w-4 text-center text-customer-text">{item.quantity}</span>
+                        <button 
+                          onClick={() => updateQuantity(item, 1)} 
+                          className="p-1 text-customer-text hover:text-customer-accent transition-colors"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                      <p className="font-bold text-customer-accent font-sans">₹{item.price * item.quantity}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => removeItem(item)}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-6 bg-white/5 border border-white/10 rounded-2xl space-y-4">
+              <div className="flex justify-between text-customer-text/70">
+                <span>Subtotal</span>
+                <span className="font-sans">₹{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-customer-text/70">
+                <span>Taxes (5%)</span>
+                <span className="font-sans">₹{(subtotal * 0.05).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-xl font-bold border-t border-white/10 pt-4 text-customer-text">
+                <span>Total</span>
+                <span className="text-customer-accent font-sans">₹{total.toFixed(2)}</span>
+              </div>
+              <button 
+                onClick={() => setActiveTab('payment')}
+                className="w-full py-4 bg-customer-primary text-customer-text font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-customer-accent hover:text-customer-bg transition-colors shadow-[0_4px_15px_rgba(45,106,79,0.5)] mt-4"
+              >
+                Proceed to Payment <ArrowRight size={20} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMobilePayment = () => {
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      handleCheckoutConfirm(checkoutForm);
+    };
+
+    return (
+      <div className="md:hidden w-full px-6 py-8 pb-32 text-left">
+        <h2 className="text-3xl font-cinzel font-bold text-customer-accent mb-6 flex items-center gap-3">
+          <CreditCard size={28} />
+          Payment
+        </h2>
+
+        {cart.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-customer-text/50">
+            <ShoppingBag size={64} className="mb-4 opacity-20" />
+            <p className="text-lg font-sans">Your cart is empty.</p>
+            <button 
+              onClick={() => setActiveTab('product')} 
+              className="mt-4 text-customer-accent hover:underline font-bold"
+            >
+              Start browsing
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6 bg-white/5 border border-white/10 rounded-3xl p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-customer-text/80 mb-2">Full Name</label>
+                <input 
+                  required
+                  type="text" 
+                  value={checkoutForm.name}
+                  onChange={e => setCheckoutForm({...checkoutForm, name: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-customer-text focus:outline-none focus:border-customer-accent transition-colors"
+                  placeholder="John Doe"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-customer-text/80 mb-2">Phone Number</label>
+                <input 
+                  required
+                  type="tel" 
+                  value={checkoutForm.phone}
+                  onChange={e => setCheckoutForm({...checkoutForm, phone: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-customer-text focus:outline-none focus:border-customer-accent transition-colors"
+                  placeholder="+91 98765 43210"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-customer-text/80 mb-2">Special Instructions</label>
+                <textarea 
+                  value={checkoutForm.instructions}
+                  onChange={e => setCheckoutForm({...checkoutForm, instructions: e.target.value})}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-customer-text focus:outline-none focus:border-customer-accent transition-colors resize-none h-24"
+                  placeholder="Any allergies or special requests?"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-customer-text/80 mb-3">Payment Method</label>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { id: 'UPI', icon: Smartphone, label: 'UPI' },
+                  { id: 'CARD', icon: CreditCard, label: 'Card' },
+                  { id: 'CASH', icon: Banknote, label: 'Cash' }
+                ].map(method => (
+                  <button
+                    key={method.id}
+                    type="button"
+                    onClick={() => setCheckoutForm({...checkoutForm, payment: method.id})}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-300 ${
+                      checkoutForm.payment === method.id 
+                        ? 'border-customer-accent bg-customer-accent/10 text-customer-accent shadow-[0_0_15px_rgba(212,163,115,0.2)]' 
+                        : 'border-white/10 bg-white/5 text-customer-text/70 hover:border-white/30'
+                    }`}
+                  >
+                    <method.icon size={24} />
+                    <span className="text-sm font-semibold">{method.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+              <div>
+                <div className="text-sm text-customer-text/70">Total to pay</div>
+                <div className="text-2xl font-bold text-customer-accent font-sans">₹{total.toFixed(2)}</div>
+              </div>
+              <button 
+                type="submit"
+                className="px-8 py-4 bg-customer-primary text-customer-text font-bold rounded-xl hover:bg-customer-accent hover:text-customer-bg transition-colors shadow-lg shadow-customer-primary/20"
+              >
+                Place Order
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="bg-customer-bg min-h-screen text-customer-text font-sans selection:bg-customer-accent selection:text-customer-bg">
@@ -135,7 +346,12 @@ const CustomerOrder = () => {
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => menuRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                setActiveTab('product');
+                setTimeout(() => {
+                  menuRef.current?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
               className="hidden sm:flex items-center gap-2.5 px-9 py-4 rounded-full border border-customer-accent/50 text-customer-accent text-lg font-bold hover:bg-customer-accent hover:text-customer-bg transition-all duration-200"
             >
               Browse Menu <ChevronDown size={22} />
@@ -145,7 +361,13 @@ const CustomerOrder = () => {
             <motion.button
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.94 }}
-              onClick={() => document.getElementById('cart-trigger-btn')?.click()}
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  setActiveTab('cart');
+                } else {
+                  document.getElementById('cart-trigger-btn')?.click();
+                }
+              }}
               className="relative flex items-center gap-2.5 px-9 py-4 rounded-full bg-customer-primary text-customer-text font-black text-lg hover:bg-customer-accent hover:text-customer-bg transition-colors duration-200 shadow-[0_0_22px_rgba(45,106,79,0.4)]"
             >
               <ShoppingBag size={22} />
@@ -170,7 +392,7 @@ const CustomerOrder = () => {
 
       {/* ── Hero Banner ── */}
       <AnimatePresence>
-        {heroVisible && (
+        {heroVisible && activeTab === 'product' && (
           <motion.section
             key="hero"
             initial={{ opacity: 0 }}
@@ -312,7 +534,8 @@ const CustomerOrder = () => {
       </AnimatePresence>
 
       {/* ── Menu Section ── */}
-      <div ref={menuRef} className="w-full">
+      {activeTab === 'product' && (
+        <div ref={menuRef} className="w-full">
         {/* Sticky category tabs */}
         <div className="sticky top-[80px] z-40 w-full bg-customer-bg/95 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
           <div className="w-full pl-32 pr-6 lg:pl-56 lg:pr-12 h-[70px] flex items-center justify-between gap-2">
@@ -395,6 +618,13 @@ const CustomerOrder = () => {
           )}
         </div>
       </div>
+      )}
+
+      {/* Mobile Cart View */}
+      {activeTab === 'cart' && renderMobileCart()}
+
+      {/* Mobile Payment View */}
+      {activeTab === 'payment' && renderMobilePayment()}
 
       {/* FloatingCart — hidden trigger button for navbar cart button */}
       <FloatingCart
@@ -424,6 +654,49 @@ const CustomerOrder = () => {
           onTrackOrder={() => setOrderSuccessId(null)}
         />
       )}
+
+      {/* ── Bottom Navigation Tab Bar (Mobile Only) ── */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-customer-bg/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center justify-around h-[70px] max-w-md mx-auto">
+          {/* Product Tab */}
+          <button 
+            onClick={() => setActiveTab('product')}
+            className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 ${
+              activeTab === 'product' ? 'text-customer-accent' : 'text-customer-text/40 hover:text-customer-accent/80'
+            }`}
+          >
+            <BookOpen size={20} className={activeTab === 'product' ? 'scale-110' : ''} />
+            <span className="text-xs font-bold mt-1">Product</span>
+          </button>
+
+          {/* Cart Tab */}
+          <button 
+            onClick={() => setActiveTab('cart')}
+            className={`flex flex-col items-center justify-center flex-1 h-full relative transition-all duration-200 ${
+              activeTab === 'cart' ? 'text-customer-accent' : 'text-customer-text/40 hover:text-customer-accent/80'
+            }`}
+          >
+            <ShoppingBag size={20} className={activeTab === 'cart' ? 'scale-110' : ''} />
+            <span className="text-xs font-bold mt-1">Cart</span>
+            {totalItems > 0 && (
+              <span className="absolute top-2 right-6 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border border-customer-bg">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
+          {/* Payment Tab */}
+          <button 
+            onClick={() => setActiveTab('payment')}
+            className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 ${
+              activeTab === 'payment' ? 'text-customer-accent' : 'text-customer-text/40 hover:text-customer-accent/80'
+            }`}
+          >
+            <CreditCard size={20} className={activeTab === 'payment' ? 'scale-110' : ''} />
+            <span className="text-xs font-bold mt-1">Payment</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

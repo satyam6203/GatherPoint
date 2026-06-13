@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth as useClerkAuth, useUser as useClerkUser, useClerk } from '@clerk/clerk-react';
 import AuthService from '../services/authService';
 
@@ -8,9 +8,11 @@ export default function useAuth() {
   const clerkObj = useClerk();
 
   // Handle case where Clerk is not loaded yet or unavailable
+  const isLoaded = clerkAuth ? clerkAuth.isLoaded : false;
   const isSignedIn = clerkAuth ? clerkAuth.isSignedIn : false;
   const clerkUser = clerkUserObj ? clerkUserObj.user : null;
-  const getToken = clerkAuth ? clerkAuth.getToken : null;
+  const getTokenRef = useRef(clerkAuth ? clerkAuth.getToken : null);
+  getTokenRef.current = clerkAuth ? clerkAuth.getToken : null;
   const signOut = clerkObj ? clerkObj.signOut : null;
 
   const [user, setUser] = useState(null);
@@ -18,11 +20,17 @@ export default function useAuth() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Track whether we've already initialised to prevent duplicate calls
+  const initRef = useRef(false);
+
   useEffect(() => {
+    // Wait for Clerk to finish loading before making any auth decisions
+    if (!isLoaded) return;
+
     const initAuth = async () => {
       try {
-        if (isSignedIn && clerkUser && getToken) {
-          const clerkToken = await getToken();
+        if (isSignedIn && clerkUser && getTokenRef.current) {
+          const clerkToken = await getTokenRef.current();
           setToken(clerkToken);
           localStorage.setItem('token', clerkToken);
 
@@ -32,7 +40,7 @@ export default function useAuth() {
             setUser(currentUser);
             localStorage.setItem('user', JSON.stringify(currentUser));
           }
-        } else {
+        } else if (!isSignedIn) {
           // Fallback to local storage (for standard email/password login)
           const currentUser = await AuthService.getCurrentUser();
           if (currentUser) {
@@ -47,11 +55,12 @@ export default function useAuth() {
         setError(err.message);
       } finally {
         setLoading(false);
+        initRef.current = true;
       }
     };
 
     initAuth();
-  }, [isSignedIn, clerkUser, getToken]);
+  }, [isLoaded, isSignedIn, clerkUser?.id]);
 
   const login = async (email, password, role) => {
     try {
@@ -90,25 +99,25 @@ export default function useAuth() {
   };
 
   const logout = async () => {
-    if (isSignedIn && signOut) {
-      await signOut();
-    }
     AuthService.logout();
     setUser(null);
     setToken(null);
     setError(null);
+    if (isSignedIn && signOut) {
+      await signOut({ redirectUrl: '/staff-pos' });
+    }
   };
 
   return {
     user,
     token,
-    loading,
+    loading: !isLoaded || loading,
     error,
     login,
     signup,
     logout,
     getToken: () => token || localStorage.getItem('token'),
     isAuthenticated: !!user,
-    isLoading: loading,
+    isLoading: !isLoaded || loading,
   };
-}
+}
