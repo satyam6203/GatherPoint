@@ -1,30 +1,29 @@
 package com.GatherPoint.backend.Model;
 
 import com.GatherPoint.backend.Constants.OrderStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@AllArgsConstructor
+@Table(name = "orders")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String orderNumber;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private BigDecimal subtotal;
@@ -32,9 +31,17 @@ public class Order {
     private BigDecimal discount;
     private BigDecimal total;
 
+    @ManyToOne
     private Customer customer;
+
+    @ManyToOne
     private User employee;
+
+    @ManyToOne
     private RestaurantTable table;
 
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
 }
