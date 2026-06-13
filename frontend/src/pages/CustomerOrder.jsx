@@ -7,12 +7,12 @@ import CheckoutModal from '../components/customer/CheckoutModal';
 import OrderSuccess from '../components/customer/OrderSuccess';
 
 const menuData = [
-  { id: 1, category: 'Coffee', productName: 'Cappuccino', description: 'Rich espresso with steamed milk foam.', price: 150, imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=600&auto=format&fit=crop' },
-  { id: 2, category: 'Coffee', productName: 'Latte', description: 'Smooth espresso with plenty of steamed milk.', price: 180, imageUrl: 'https://images.unsplash.com/photo-1568644396922-5c3bfae12521?q=80&w=600&auto=format&fit=crop' },
-  { id: 3, category: 'Burgers', productName: 'Cheese Burger', description: 'Juicy patty with melted cheese and fresh veggies.', price: 250, imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop' },
-  { id: 4, category: 'Pizza', productName: 'Margherita Pizza', description: 'Classic delight with 100% real mozzarella cheese.', price: 350, imageUrl: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=600&auto=format&fit=crop' },
-  { id: 5, category: 'Tea', productName: 'Masala Chai', description: 'Traditional Indian spiced tea brewed to perfection.', price: 120, imageUrl: 'https://images.unsplash.com/photo-1576092762791-dd9e2220afa1?q=80&w=600&auto=format&fit=crop' },
-  { id: 6, category: 'Desserts', productName: 'Chocolate Brownie', description: 'Warm fudge brownie with a crisp exterior.', price: 200, imageUrl: 'https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?q=80&w=600&auto=format&fit=crop' },
+  { id: 1, category: 'Coffee', productName: 'Cappuccino', description: 'Rich espresso with steamed milk foam. Perfectly balanced.', price: 150, imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=600&auto=format&fit=crop', rating: '4.8', prepTime: '5 mins', calories: '120 kcal' },
+  { id: 2, category: 'Coffee', productName: 'Latte', description: 'Smooth espresso with plenty of steamed milk. A morning classic.', price: 180, imageUrl: 'https://images.unsplash.com/photo-1568644396922-5c3bfae12521?q=80&w=600&auto=format&fit=crop', rating: '4.6', prepTime: '5 mins', calories: '150 kcal' },
+  { id: 3, category: 'Burgers', productName: 'Cheese Burger', description: 'Juicy patty with melted cheese and fresh veggies in a toasted bun.', price: 250, imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop', rating: '4.9', prepTime: '15 mins', calories: '450 kcal' },
+  { id: 4, category: 'Pizza', productName: 'Margherita', description: 'Classic delight with 100% real mozzarella cheese on thin crust.', price: 350, imageUrl: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=600&auto=format&fit=crop', rating: '4.7', prepTime: '20 mins', calories: '600 kcal' },
+  { id: 5, category: 'Tea', productName: 'Masala Chai', description: 'Traditional Indian spiced tea brewed to perfection.', price: 120, imageUrl: 'https://images.unsplash.com/photo-1576092762791-dd9e2220afa1?q=80&w=600&auto=format&fit=crop', rating: '4.5', prepTime: '10 mins', calories: '90 kcal' },
+  { id: 6, category: 'Desserts', productName: 'Fudge Brownie', description: 'Warm fudge brownie with a crisp exterior and gooey center.', price: 200, imageUrl: 'https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?q=80&w=600&auto=format&fit=crop', rating: '4.9', prepTime: '5 mins', calories: '350 kcal' },
 ];
 
 const CustomerOrder = () => {
@@ -78,8 +78,8 @@ const CustomerOrder = () => {
           onSelectCategory={setSelectedCategory} 
         />
         
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="max-w-[90rem] mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredMenu.map(product => (
               <ProductCard key={product.id} product={product} onAdd={addToCart} />
             ))}
