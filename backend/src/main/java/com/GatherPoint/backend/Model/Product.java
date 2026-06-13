@@ -1,32 +1,32 @@
 package com.GatherPoint.backend.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    private String ProductName;
+    private String productName;
 
-    private int price;
+    private BigDecimal price;
+
+    private String uom;
+
+    private BigDecimal tax;
 
     private String description;
 
-    private int tax;
-
+    @ManyToOne
     private Category category;
 }

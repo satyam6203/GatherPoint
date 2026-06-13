@@ -6,25 +6,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Coupon {
+public class PaymentMethod {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String code;
+    private String name;
 
-    private String discountType;
+    private boolean enabled;
 
-    private BigDecimal discountValue;
-
-    private boolean active;
+    private String upiId;
 }

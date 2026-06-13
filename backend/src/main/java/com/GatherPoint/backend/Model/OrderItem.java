@@ -1,19 +1,14 @@
 package com.GatherPoint.backend.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class OrderItem {
@@ -23,9 +18,14 @@ public class OrderItem {
     private Long id;
 
     private Integer quantity;
+
     private BigDecimal unitPrice;
+
     private BigDecimal totalPrice;
 
+    @ManyToOne
     private Product product;
+
+    @ManyToOne
     private Order order;
 }
